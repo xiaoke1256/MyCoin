@@ -8,7 +8,7 @@ import (
 	"xiaoke1256.com/mycoin/model"
 )
 
-func mine() {
+func Mine() {
 
 	//挖创世区块
 	//构造block
@@ -20,7 +20,7 @@ func mine() {
 	t1.InputCounter = 0
 	t1.OutputCounter = 5
 
-	outputs := []model.CoreOutput{}
+	outputs := make([]model.CoreOutput, 5, 5)
 	for i := 0; i < 5; i++ {
 		output := model.CoreOutput{}
 		amt, err := decimal.NewFromString("50000000000000000000")
