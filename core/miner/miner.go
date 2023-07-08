@@ -6,6 +6,8 @@ import (
 	"github.com/shopspring/decimal"
 
 	"xiaoke1256.com/mycoin/model"
+
+	"xiaoke1256.com/mycoin/crypt"
 )
 
 func Mine() {
@@ -14,7 +16,7 @@ func Mine() {
 	//构造block
 	newBlock := model.CoreBlock{}
 
-	//构造交易
+	//构造交易(这是个coinbase交易)
 	t1 := model.CoreTransaction{}
 	t1.Version = "1.0"
 	t1.InputCounter = 0
@@ -42,8 +44,8 @@ func Mine() {
 	//构造head
 	head := model.CoreBlockheader{}
 	head.Version = "1.0"
-	head.ParentHeadHash = []byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'} //创世区块的父区块是个默认值
-	//head.TransactionsMerkleRoot =
+	head.ParentHeadHash = crypt.Sha256(crypt.Sha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'})) //创世区块的父区块是个默认值
+	head.TransactionsMerkleRoot = newBlock.GetTransactionMerkleRoot()
 	head.Timestamp = time.Now()
 	head.Target = []byte{0xFF, 0xFF, 0x00, 0x00}
 

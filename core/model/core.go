@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/shopspring/decimal"
+
+	"xiaoke1256.com/mycoin/crypt"
 )
 
 type CoreBlock struct {
@@ -66,6 +68,14 @@ type CoreOutput struct {
 	LockScriptSize uint32
 	/* 不定	锁定脚本	一个定义了支付输出所需条件的脚本 */
 	LockScript string
+}
+
+func (block CoreBlock) GetTransactionMerkleRoot() []byte {
+	bytes := [][]byte{}
+	for _, t := range block.Transactions {
+		bytes = append(bytes, t.ToBytes())
+	}
+	return crypt.MerkleRoot(bytes)
 }
 
 /*
