@@ -128,7 +128,7 @@ func (input CoreInput) ToJson() string {
 
 func (output CoreOutput) ToJson() string {
 	var s = "{"
-	s += "amt:" + strconv.FormatUint(uint64(output.Amt), 10)
+	s += "amt:" + output.Amt.String()
 	s += ","
 	s += "lockScriptSize:" + strconv.FormatUint(uint64(output.LockScriptSize), 10)
 	s += ","
