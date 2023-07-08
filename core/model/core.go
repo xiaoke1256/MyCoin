@@ -72,7 +72,7 @@ type CoreOutput struct {
 把一个交易转成byte数组
 */
 func (t CoreTransaction) ToBytes() []byte {
-	return []byte{}
+	return []byte(t.ToJson())
 }
 
 /*
@@ -96,7 +96,19 @@ func (t CoreTransaction) ToJson() string {
 	}
 	s += "]"
 	s += ","
-	s += "outputCounter:"+strconv.FormatUint(uint64(t.OnputCounter), 10)
+	s += "outputCounter:" + strconv.FormatUint(uint64(t.OutputCounter), 10)
+	s += ","
+	s += "outputs:"
+	s += "["
+	for i, output := range t.Outputs {
+		if i > 0 {
+			s += ","
+		}
+		s += output.ToJson()
+	}
+	s += "]"
+	s += ","
+	s += "lockTime:" + strconv.FormatInt(t.LockTime.UTC().Unix(), 10)
 	s += "}"
 	return s
 }
@@ -109,7 +121,18 @@ func (input CoreInput) ToJson() string {
 	s += ","
 	s += "unlockScriptSize:" + strconv.FormatUint(uint64(input.UnlockScriptSize), 10)
 	s += ","
-	s += "unlockScript:" + input.UnlockScript
+	s += "unlockScript:'" + input.UnlockScript + "'"
+	s += "}"
+	return s
+}
+
+func (output CoreOutput) ToJson() string {
+	var s = "{"
+	s += "amt:" + strconv.FormatUint(uint64(output.Amt), 10)
+	s += ","
+	s += "lockScriptSize:" + strconv.FormatUint(uint64(output.LockScriptSize), 10)
+	s += ","
+	s += "LockScript:'" + output.LockScript + "'"
 	s += "}"
 	return s
 }
