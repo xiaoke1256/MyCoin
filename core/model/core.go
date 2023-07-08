@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	"strconv"
+
 	"github.com/shopspring/decimal"
 )
 
@@ -71,4 +73,43 @@ type CoreOutput struct {
 */
 func (t CoreTransaction) ToBytes() []byte {
 	return []byte{}
+}
+
+/*
+把一个交易转成 json
+*/
+func (t CoreTransaction) ToJson() string {
+	var s = ""
+	s += "{"
+	s += "version:"
+	s += "'" + t.Version + "'"
+	s += ","
+	s += "inputCounter:" + strconv.FormatUint(uint64(t.InputCounter), 10)
+	s += ","
+	s += "inputs:"
+	s += "["
+	for i, input := range t.Inputs {
+		if i > 0 {
+			s += ","
+		}
+		s += input.ToJson()
+	}
+	s += "]"
+	s += ","
+	s += "outputCounter:"+strconv.FormatUint(uint64(t.OnputCounter), 10)
+	s += "}"
+	return s
+}
+
+func (input CoreInput) ToJson() string {
+	var s = "{"
+	s += "TXHash:" + string(input.TXHash)
+	s += ","
+	s += "UTXOIdx:" + strconv.FormatUint(uint64(input.UTXOIdx), 10)
+	s += ","
+	s += "unlockScriptSize:" + strconv.FormatUint(uint64(input.UnlockScriptSize), 10)
+	s += ","
+	s += "unlockScript:" + input.UnlockScript
+	s += "}"
+	return s
 }
