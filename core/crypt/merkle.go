@@ -1,19 +1,19 @@
 package crypt
 
-//计算merkle的root
-func MerkleRoot(content [][]byte) []byte {
+// 计算merkle的root
+func MerkleRoot(content [][]byte) [32]byte {
 	if len(content)%2 == 1 {
 		content = append(content, content[len(content)-1])
 	}
 
 	length := len(content)
 	if length == 1 {
-		return Sha256(Sha256(content[0]))
+		return DoubleSha256(content[0])
 	}
 
 	if length == 2 {
 		root := append(content[0], content[1]...)
-		return Sha256(Sha256(root))
+		return DoubleSha256(root)
 	}
 
 	weight := 1
@@ -23,8 +23,14 @@ func MerkleRoot(content [][]byte) []byte {
 
 	left := content[0:weight]
 	right := content[weight:]
-	root := append(MerkleRoot(left), MerkleRoot(right)...)
-	return Sha256(Sha256(root))
+	root := []byte{}
+	for _, b := range MerkleRoot(left) {
+		root = append(root, b)
+	}
+	for _, b := range MerkleRoot(right) {
+		root = append(root, b)
+	}
+	return DoubleSha256(root)
 }
 
 // /*

@@ -1,6 +1,7 @@
 package miner
 
 import (
+	//"math/big"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -8,6 +9,7 @@ import (
 	"xiaoke1256.com/mycoin/model"
 
 	"xiaoke1256.com/mycoin/crypt"
+	//"crypto/rand"
 )
 
 func Mine() {
@@ -44,9 +46,12 @@ func Mine() {
 	//构造head
 	head := model.CoreBlockheader{}
 	head.Version = "1.0"
-	head.ParentHeadHash = crypt.Sha256(crypt.Sha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'})) //创世区块的父区块是个默认值
+	head.ParentHeadHash = crypt.DoubleSha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'}) //创世区块的父区块是个默认值
 	head.TransactionsMerkleRoot = newBlock.GetTransactionMerkleRoot()
 	head.Timestamp = time.Now()
-	head.Target = []byte{0xFF, 0xFF, 0x00, 0x00}
+	head.Target = [4]byte{0xFF, 0xFF, 0x00, 0x00}
+
+	//randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
+	//head.Nonce =
 
 }

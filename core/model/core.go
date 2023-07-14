@@ -21,17 +21,17 @@ type CoreBlockheader struct {
 	/*4	版本	区块版本号，表示本区块遵守的验证规则*/
 	Version string
 	/*32	父区块头哈希值	前一区块的哈希值，使用SHA256(SHA256(父区块头))计算*/
-	ParentHeadHash []byte
+	ParentHeadHash [32]byte
 	/*32	Merkle根	该区块中交易的Merkle树根的哈希值，同样采用SHA256(SHA256())计算*/
-	TransactionsMerkleRoot []byte
+	TransactionsMerkleRoot [32]byte
 	/* 4	时间戳	该区块产生的近似时间，精确到秒的UNIX时间戳，必须严格大于前11个区块时间的中值，
 	同时全节点也会拒绝那些超出自己2个小时时间戳的区块*/
 	Timestamp time.Time
 	/* 4	难度目标	该区块工作量证明算法的难度目标，已经使用特定算法编码*/
-	Target []byte
+	Target [4]byte
 	/* 4	Nonce	为了找到满足难度目标所设定的随机数，
 	为了解决32位随机数在算力飞升的情况下不够用的问题，规定时间戳和coinbase交易信息均可更改，以此扩展nonce的位数*/
-	Nonce []byte
+	Nonce [4]byte
 }
 
 type CoreTransaction struct {
@@ -51,7 +51,7 @@ type CoreTransaction struct {
 
 type CoreInput struct {
 	/*32	交易哈希值	指向被花费的UTXO所在的交易的哈希*/
-	TXHash []byte
+	TXHash [32]byte
 	/*4	输出索引	被花费的UTXO的索引号，第一个是0*/
 	UTXOIdx uint16
 	/*1-9	解锁脚本大小	用字节表示的后面的解锁脚本长度*/
@@ -70,7 +70,7 @@ type CoreOutput struct {
 	LockScript string
 }
 
-func (block CoreBlock) GetTransactionMerkleRoot() []byte {
+func (block CoreBlock) GetTransactionMerkleRoot() [32]byte {
 	bytes := [][]byte{}
 	for _, t := range block.Transactions {
 		bytes = append(bytes, t.ToBytes())
@@ -125,13 +125,15 @@ func (t CoreTransaction) ToJson() string {
 
 func (input CoreInput) ToJson() string {
 	var s = "{"
-	s += "TXHash:" + string(input.TXHash)
+	copyBytes := make([]byte, len(input.TXHash))
+	copy(copyBytes, input.TXHash[:])
+	s += "TXHash:" + string(copyBytes)
 	s += ","
 	s += "UTXOIdx:" + strconv.FormatUint(uint64(input.UTXOIdx), 10)
 	s += ","
 	s += "unlockScriptSize:" + strconv.FormatUint(uint64(input.UnlockScriptSize), 10)
 	s += ","
-	s += "unlockScript:'" + input.UnlockScript + "'"
+	s += "unlockScript:'" + input.UnlockScript + "'" /*里面会有转义字符的*/
 	s += "}"
 	return s
 }
@@ -142,7 +144,7 @@ func (output CoreOutput) ToJson() string {
 	s += ","
 	s += "lockScriptSize:" + strconv.FormatUint(uint64(output.LockScriptSize), 10)
 	s += ","
-	s += "LockScript:'" + output.LockScript + "'"
+	s += "LockScript:'" + output.LockScript + "'" /*里面会有转义字符的*/
 	s += "}"
 	return s
 }
