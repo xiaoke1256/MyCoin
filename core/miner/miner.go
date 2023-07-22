@@ -59,7 +59,7 @@ func Mine() {
 		copy(bytes4[:4], randNum.Bytes())
 		head.Nonce = bytes4
 		//校验是否满足target
-		hashedBytes := crypt.Sha256(head.ToBytes())
+		hashedBytes := crypt.Md5(head.ToBytes())
 		var hashedBytes4 [4]byte
 		copy(hashedBytes4[:4], hashedBytes[0:4])
 		if compareBytes(hashedBytes4, head.Target) < 0 {
