@@ -148,3 +148,24 @@ func (output CoreOutput) ToJson() string {
 	s += "}"
 	return s
 }
+
+func (header CoreBlockheader) ToJson() string {
+	var s = "{"
+	s += "version:'" + header.Version + "'"
+	s += ","
+	s += "parentHeadHash:'" + string(header.ParentHeadHash[0:32]) + "'"
+	s += ","
+	s += "transactionsMerkleRoot:'" + string(header.TransactionsMerkleRoot[0:32]) + "'"
+	s += ","
+	s += "timestamp:" + strconv.FormatInt(header.Timestamp.UTC().Unix(), 10) + ""
+	s += ","
+	s += "target:'" + string(header.Target[0:4]) + "'"
+	s += ","
+	s += "nonce:'" + string(header.Nonce[0:4]) + "'"
+	s += "}"
+	return s
+}
+
+func (header CoreBlockheader) ToBytes() []byte {
+	return []byte(header.ToJson())
+}

@@ -1,15 +1,16 @@
 package miner
 
 import (
-	//"math/big"
+	"math/big"
 	"time"
 
 	"github.com/shopspring/decimal"
 
 	"xiaoke1256.com/mycoin/model"
 
+	"crypto/rand"
+
 	"xiaoke1256.com/mycoin/crypt"
-	//"crypto/rand"
 )
 
 func Mine() {
@@ -51,7 +52,22 @@ func Mine() {
 	head.Timestamp = time.Now()
 	head.Target = [4]byte{0xFF, 0xFF, 0x00, 0x00}
 
-	//randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
-	//head.Nonce =
+	//挖吖挖吖挖
+	randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
+	var bytes4 [4]byte
+	copy(bytes4[:4], randNum.Bytes())
+	head.Nonce = bytes4
+	//校验是否满足target
+	if compareBytes(crypt.Sha256(head.ToBytes()), head.Target) < 0 {
+		//满足需求
 
+	}
+
+}
+
+/*
+两个byte数组比大小
+*/
+func compareBytes(bytes1 [32]byte, bytes2 [4]byte) int {
+	return 0
 }
