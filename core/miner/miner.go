@@ -53,21 +53,27 @@ func Mine() {
 	head.Target = [4]byte{0xFF, 0xFF, 0x00, 0x00}
 
 	//挖吖挖吖挖
-	randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
-	var bytes4 [4]byte
-	copy(bytes4[:4], randNum.Bytes())
-	head.Nonce = bytes4
-	//校验是否满足target
-	if compareBytes(crypt.Sha256(head.ToBytes()), head.Target) < 0 {
-		//满足需求
-
+	for true {
+		randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
+		var bytes4 [4]byte
+		copy(bytes4[:4], randNum.Bytes())
+		head.Nonce = bytes4
+		//校验是否满足target
+		hashedBytes := crypt.Sha256(head.ToBytes())
+		var hashedBytes4 [4]byte
+		copy(hashedBytes4[:4], hashedBytes[0:4])
+		if compareBytes(hashedBytes4, head.Target) < 0 {
+			//满足需求
+			break
+		}
 	}
+	//挖出来了就保存区块
 
 }
 
 /*
 两个byte数组比大小
 */
-func compareBytes(bytes1 [32]byte, bytes2 [4]byte) int {
+func compareBytes(bytes1 [4]byte, bytes2 [4]byte) int {
 	return 0
 }
