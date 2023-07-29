@@ -75,5 +75,14 @@ func Mine() {
 两个byte数组比大小
 */
 func compareBytes(bytes1 [4]byte, bytes2 [4]byte) int {
+	for i := 0; i < 4; i++ {
+		if bytes1[i] < bytes2[i] {
+			return 1
+		} else if bytes1[i] > bytes2[i] {
+			return -1
+		} else {
+			continue
+		}
+	}
 	return 0
 }
