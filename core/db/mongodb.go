@@ -62,10 +62,10 @@ func Insert(obj any) {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	fmt.Println("Inserted documents with IDs:", result.InsertedIDs)
+	//fmt.Println("Inserted documents with IDs:", result.InsertedIDs)
 }
 
-func Search() {
+func Search[T any]() []T {
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
@@ -80,23 +80,22 @@ func Search() {
 	// Collection handle
 	collection := client.Database("test").Collection("student")
 
-	// Find a single document
-	var result Student
-	err = collection.FindOne(ctx, bson.M{"name": "Tom"}).Decode(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Found student with name:", result.Name)
+	// // Find a single document
+	// var result T
+	// err = collection.FindOne(ctx, bson.M{"name": "Tom"}).Decode(&result)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// Find multiple documents
-	var results []Student
+	var results []T
 	cur, err := collection.Find(ctx, bson.M{"age": bson.M{"$gt": 17}})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer cur.Close(ctx)
 	for cur.Next(ctx) {
-		var elem Student
+		var elem T
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
@@ -107,4 +106,5 @@ func Search() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Found multiple students with age > 17: %+v\n", results)
+	return results
 }
