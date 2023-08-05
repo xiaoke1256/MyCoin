@@ -30,7 +30,7 @@ func Connect() {
 	fmt.Println("Connected to MongoDB!")
 }
 
-func Insert(obj any) {
+func Insert( collectionName string, obj any) {
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
@@ -43,7 +43,7 @@ func Insert(obj any) {
 	}
 
 	// Collection handle
-	collection := client.Database("test").Collection("student")
+	collection := client.Database("test").Collection(collectionName)
 
 	// Insert a single document
 	//student := Student{"Tom", 18, "male", "Beijing"}

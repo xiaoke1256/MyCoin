@@ -11,6 +11,10 @@ import (
 	"crypto/rand"
 
 	"xiaoke1256.com/mycoin/crypt"
+
+	"xiaoke1256.com/mycoin/db"
+
+	"fmt"
 )
 
 func Mine() {
@@ -50,7 +54,9 @@ func Mine() {
 	head.ParentHeadHash = crypt.DoubleSha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'}) //创世区块的父区块是个默认值
 	head.TransactionsMerkleRoot = newBlock.GetTransactionMerkleRoot()
 	head.Timestamp = time.Now()
-	head.Target = [4]byte{0xFF, 0xFF, 0x00, 0x00}
+	head.Target = [4]byte{ 0x00, 0xFF,0xFF, 0xFF}
+
+	newBlock.Blockheader = head;
 
 	//挖吖挖吖挖
 	for true {
@@ -62,12 +68,14 @@ func Mine() {
 		hashedBytes := crypt.Md5(head.ToBytes())
 		var hashedBytes4 [4]byte
 		copy(hashedBytes4[:4], hashedBytes[0:4])
+		fmt.Println("hashedBytes4:"+string(hashedBytes4[:4]))
 		if compareBytes(hashedBytes4, head.Target) < 0 {
 			//满足需求
 			break
 		}
 	}
 	//挖出来了就保存区块
+	db.Insert("block",newBlock)
 
 }
 
@@ -77,9 +85,11 @@ func Mine() {
 func compareBytes(bytes1 [4]byte, bytes2 [4]byte) int {
 	for i := 0; i < 4; i++ {
 		if bytes1[i] < bytes2[i] {
-			return 1
-		} else if bytes1[i] > bytes2[i] {
+			fmt.Println("-1");
 			return -1
+		} else if bytes1[i] > bytes2[i] {
+			fmt.Println("1");
+			return 1
 		} else {
 			continue
 		}
