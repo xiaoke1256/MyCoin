@@ -1,14 +1,13 @@
 package miner
 
 import (
-	"math/big"
 	"time"
 
 	"github.com/shopspring/decimal"
 
 	"xiaoke1256.com/mycoin/model"
 
-	"crypto/rand"
+	"math/rand"
 
 	"xiaoke1256.com/mycoin/crypt"
 
@@ -54,28 +53,31 @@ func Mine() {
 	head.ParentHeadHash = crypt.DoubleSha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'}) //创世区块的父区块是个默认值
 	head.TransactionsMerkleRoot = newBlock.GetTransactionMerkleRoot()
 	head.Timestamp = time.Now()
-	head.Target = [4]byte{ 0x00, 0xFF,0xFF, 0xFF}
+	head.Target = [4]byte{0x00, 0x00, 0xFF, 0xFF}
 
-	newBlock.Blockheader = head;
+	newBlock.Blockheader = head
 
 	//挖吖挖吖挖
 	for true {
-		randNum, _ := rand.Int(rand.Reader, big.NewInt(128))
-		var bytes4 [4]byte
-		copy(bytes4[:4], randNum.Bytes())
+		rand.Seed(time.Now().UnixNano())
+		randNum1 := rand.Intn(2 ^ 16)
+		randNum2 := rand.Intn(2 ^ 16)
+		randNum3 := rand.Intn(2 ^ 16)
+		randNum4 := rand.Intn(2 ^ 16)
+		var bytes4 [4]byte = [4]byte{byte(randNum1), byte(randNum2), byte(randNum3), byte(randNum4)}
 		head.Nonce = bytes4
 		//校验是否满足target
 		hashedBytes := crypt.Md5(head.ToBytes())
 		var hashedBytes4 [4]byte
 		copy(hashedBytes4[:4], hashedBytes[0:4])
-		fmt.Println("hashedBytes4:"+string(hashedBytes4[:4]))
+		fmt.Printf("hashedBytes4: %x", hashedBytes4)
 		if compareBytes(hashedBytes4, head.Target) < 0 {
 			//满足需求
 			break
 		}
 	}
 	//挖出来了就保存区块
-	db.Insert("block",newBlock)
+	db.Insert("block", newBlock)
 
 }
 
@@ -85,10 +87,10 @@ func Mine() {
 func compareBytes(bytes1 [4]byte, bytes2 [4]byte) int {
 	for i := 0; i < 4; i++ {
 		if bytes1[i] < bytes2[i] {
-			fmt.Println("-1");
+			fmt.Println("-1")
 			return -1
 		} else if bytes1[i] > bytes2[i] {
-			fmt.Println("1");
+			fmt.Println("1")
 			return 1
 		} else {
 			continue
