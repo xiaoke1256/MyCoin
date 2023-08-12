@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +13,32 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type DBConfig struct {
+	dbtype   string
+	host     string
+	port     int
+	database string
+}
+
+var Config DBConfig
+
+func Init() {
+	jsonFile, err := os.Open("config.json")
+	if err != nil {
+		log.Fatalln("Cannot open config file", err)
+	}
+	defer jsonFile.Close()
+	decoder := json.NewDecoder(jsonFile)
+	err = decoder.Decode(&Config)
+	if err != nil {
+		fmt.Println("Cannot get configuration from file")
+		return
+	}
+	fmt.Println(Config)
+}
+
 func Connect() {
+	Init()
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	// Connect to MongoDB
@@ -30,7 +57,11 @@ func Connect() {
 	fmt.Println("Connected to MongoDB!")
 }
 
-func Insert( collectionName string, obj any) {
+func init() {
+	panic("unimplemented")
+}
+
+func Insert(collectionName string, obj any) {
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
@@ -65,7 +96,7 @@ func Insert( collectionName string, obj any) {
 	//fmt.Println("Inserted documents with IDs:", result.InsertedIDs)
 }
 
-func Search[T any]() []T {
+func Search[T any](collectionName string) []T {
 	// Set client options
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
@@ -78,7 +109,7 @@ func Search[T any]() []T {
 	}
 
 	// Collection handle
-	collection := client.Database("test").Collection("student")
+	collection := client.Database("test").Collection(collectionName)
 
 	// // Find a single document
 	// var result T
