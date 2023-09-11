@@ -61,10 +61,10 @@ func Mine() {
 	rand.Seed(lastSeek)
 	//挖吖挖吖挖
 	for true {
-		if time.Now().UnixNano() > lastSeek+10 {
-			lastSeek = time.Now().UnixNano()
-			rand.Seed(lastSeek)
-		}
+		// if time.Now().UnixNano() > lastSeek+10 {
+		// 	lastSeek = time.Now().UnixNano()
+		// 	rand.Seed(lastSeek)
+		// }
 		randNum1 := rand.Intn(2 ^ 16)
 		randNum2 := rand.Intn(2 ^ 16)
 		randNum3 := rand.Intn(2 ^ 16)
