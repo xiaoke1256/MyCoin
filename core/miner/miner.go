@@ -53,13 +53,18 @@ func Mine() {
 	head.ParentHeadHash = crypt.DoubleSha256([]byte{'G', 'E', 'N', 'E', 'S', 'I', 'S'}) //创世区块的父区块是个默认值
 	head.TransactionsMerkleRoot = newBlock.GetTransactionMerkleRoot()
 	head.Timestamp = time.Now()
-	head.Target = [4]byte{0x00, 0x00, 0xFF, 0xFF}
+	head.Target = [4]byte{0x00, 0x00, 0x8F, 0xFF}
 
 	newBlock.Blockheader = head
 
+	lastSeek := time.Now().UnixNano()
+	rand.Seed(lastSeek)
 	//挖吖挖吖挖
 	for true {
-		rand.Seed(time.Now().UnixNano())
+		if time.Now().UnixNano() > lastSeek+10 {
+			lastSeek = time.Now().UnixNano()
+			rand.Seed(lastSeek)
+		}
 		randNum1 := rand.Intn(2 ^ 16)
 		randNum2 := rand.Intn(2 ^ 16)
 		randNum3 := rand.Intn(2 ^ 16)
@@ -68,15 +73,17 @@ func Mine() {
 		head.Nonce = bytes4
 		//校验是否满足target
 		hashedBytes := crypt.Md5(head.ToBytes())
+		fmt.Printf("hashedBytes: %x \n", hashedBytes)
 		var hashedBytes4 [4]byte
 		copy(hashedBytes4[:4], hashedBytes[0:4])
-		fmt.Printf("hashedBytes4: %x", hashedBytes4)
+		fmt.Printf("hashedBytes4: %x \n", hashedBytes4)
 		if compareBytes(hashedBytes4, head.Target) < 0 {
 			//满足需求
 			break
 		}
 	}
 	//挖出来了就保存区块
+	db.Connect()
 	db.Insert("block", newBlock)
 
 }

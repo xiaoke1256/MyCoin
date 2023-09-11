@@ -14,33 +14,17 @@ import (
 )
 
 type DBConfig struct {
-	dbtype   string
-	host     string
-	port     int
-	database string
+	Dbtype   string
+	Host     string
+	Port     int
+	Database string
 }
 
 var Config DBConfig
 
-func Init() {
-	jsonFile, err := os.Open("config.json")
-	if err != nil {
-		log.Fatalln("Cannot open config file", err)
-	}
-	defer jsonFile.Close()
-	decoder := json.NewDecoder(jsonFile)
-	err = decoder.Decode(&Config)
-	if err != nil {
-		fmt.Println("Cannot get configuration from file")
-		return
-	}
-	fmt.Println(Config)
-}
-
 func Connect() {
-	Init()
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -58,12 +42,27 @@ func Connect() {
 }
 
 func init() {
-	panic("unimplemented")
+	jsonFile, err := os.Open("dbConfig.json")
+	if err != nil {
+		log.Fatalln("Cannot open config file", err)
+		panic(err)
+	}
+	defer jsonFile.Close()
+
+	decoder := json.NewDecoder(jsonFile)
+
+	err = decoder.Decode(&Config)
+	if err != nil {
+		fmt.Println("Cannot get configuration from file")
+		panic(err)
+	}
+	fmt.Println("Config:")
+	fmt.Println(Config)
 }
 
 func Insert(collectionName string, obj any) {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
 
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -74,7 +73,7 @@ func Insert(collectionName string, obj any) {
 	}
 
 	// Collection handle
-	collection := client.Database("test").Collection(collectionName)
+	collection := client.Database(Config.Database).Collection(collectionName)
 
 	// Insert a single document
 	//student := Student{"Tom", 18, "male", "Beijing"}
@@ -82,7 +81,7 @@ func Insert(collectionName string, obj any) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Inserted student with ID:", result.InsertedID)
+	fmt.Println("Inserted data with ID:", result.InsertedID)
 
 	// Insert multiple documents
 	// students := []interface{}{
@@ -98,7 +97,7 @@ func Insert(collectionName string, obj any) {
 
 func Search[T any](collectionName string) []T {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
 
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -109,7 +108,7 @@ func Search[T any](collectionName string) []T {
 	}
 
 	// Collection handle
-	collection := client.Database("test").Collection(collectionName)
+	collection := client.Database(Config.Database).Collection(collectionName)
 
 	// // Find a single document
 	// var result T
@@ -136,6 +135,5 @@ func Search[T any](collectionName string) []T {
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Found multiple students with age > 17: %+v\n", results)
 	return results
 }
