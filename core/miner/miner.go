@@ -1,6 +1,9 @@
 package miner
 
 import (
+	"encoding/json"
+	"log"
+	"os"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -13,12 +16,42 @@ import (
 
 	"xiaoke1256.com/mycoin/db"
 
+	"errors"
+
 	"fmt"
 )
 
-func Mine() {
+type CoinConfig struct {
+	Coinbase      string          /*Coinbase 账号*/
+	InitAddresses []string        /* 5个初始账号*/
+	InitFund      decimal.Decimal /*初始区块*/
+}
 
-	//挖创世区块
+var Config CoinConfig
+
+func init() {
+	jsonFile, err := os.Open("coinCongfig.json")
+	if err != nil {
+		log.Fatalln("Cannot open config file", err)
+		panic(err)
+	}
+	defer jsonFile.Close()
+
+	decoder := json.NewDecoder(jsonFile)
+
+	err = decoder.Decode(&Config)
+	if err != nil {
+		fmt.Println("Cannot get configuration from file")
+		panic(err)
+	}
+	fmt.Println("Config:")
+	fmt.Println(Config)
+}
+
+/*
+挖创世区块
+*/
+func MineForGenesis() {
 	//构造block
 	newBlock := model.CoreBlock{}
 
@@ -26,18 +59,21 @@ func Mine() {
 	t1 := model.CoreTransaction{}
 	t1.Version = "1.0"
 	t1.InputCounter = 0
-	t1.OutputCounter = 5
+	OutputCount := len(Config.InitAddresses)
+	if OutputCount <= 0 {
+		panic(errors.New("请设置初始账号"))
+	}
+	if OutputCount > 5 {
+		OutputCount = 5
+	}
+	t1.OutputCounter = uint32(OutputCount)
 
-	outputs := make([]model.CoreOutput, 5, 5)
-	for i := 0; i < 5; i++ {
+	outputs := make([]model.CoreOutput, OutputCount, OutputCount)
+	for i := 0; i < OutputCount; i++ {
 		output := model.CoreOutput{}
-		amt, err := decimal.NewFromString("50000000000000000000")
-		if err != nil {
-			panic(err)
-		}
-		output.Amt = amt
-		output.LockScriptSize = uint32(len("ssss"))
-		output.LockScript = "ssss"
+		output.Amt = Config.InitFund
+		output.LockScriptSize = uint32(len(Config.InitAddresses[i]))
+		output.LockScript = Config.InitAddresses[i]
 		outputs[i] = output
 	}
 	t1.Outputs = outputs
