@@ -48,6 +48,17 @@ func init() {
 	fmt.Println(Config)
 }
 
+func Mine() {
+	//看看数据库里有没有区块
+	var parentBlock *model.CoreBlock = db.SearchLastOne("block", "blockheader.timestamp", model.CoreBlock{})
+	//没有则挖创世区块
+	if parentBlock == nil {
+		MineForGenesis()
+		return
+	}
+	//有则以现有区块为父区块挖下一个区块。
+}
+
 /*
 挖创世区块
 */

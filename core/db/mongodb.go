@@ -137,3 +137,41 @@ func Search[T any](collectionName string) []T {
 	}
 	return results
 }
+
+/*
+查询最后一个区块
+*/
+func SearchLastOne[T any](collectionName string, orderCol string, org T) *T {
+	// Set client options
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
+
+	// Connect to MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Collection handle
+	collection := client.Database(Config.Database).Collection(collectionName)
+	l := options.Find().SetLimit(1)
+	s := options.Find().SetSort(bson.D{{orderCol, -1}}) //"blockheader.timestamp"
+
+	var result T
+	cur, err := collection.Find(ctx, bson.M{}, l, s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(ctx)
+	if cur.Next(ctx) {
+		err := cur.Decode(result)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return &result
+}
