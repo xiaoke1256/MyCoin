@@ -165,7 +165,7 @@ func SearchLastOne[T any](collectionName string, orderCol string, org T) *T {
 	}
 	defer cur.Close(ctx)
 	if cur.Next(ctx) {
-		err := cur.Decode(result)
+		err := cur.Decode(&result)
 		if err != nil {
 			log.Fatal(err)
 		}
