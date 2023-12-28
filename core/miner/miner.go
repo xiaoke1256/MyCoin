@@ -136,6 +136,19 @@ func MineForGenesis() {
 }
 
 /*
+ * 从父块开始挖
+ */
+func MineFromParent(parentBlock model.CoreBlock) {
+	parentHead := parentBlock.Blockheader
+	//获取待打包的交易
+	//检查每笔交易的合法性，即有无双花情况
+	//创建Coinbase 交易
+	//构造新的Head
+	//检查前两个区块玩出来的时间差，以决定要不要跳转目标难度
+	//挖呀挖呀挖
+}
+
+/*
 两个byte数组比大小
 */
 func compareBytes(bytes1 [4]byte, bytes2 [4]byte) int {
