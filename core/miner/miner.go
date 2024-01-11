@@ -167,6 +167,7 @@ func MineFromParent(parentHead model.CoreBlockheader) {
 	output.LockScriptSize = uint32(len(Config.Coinbase))
 	output.LockScript = Config.Coinbase
 	outputs[0] = output
+	t1.Outputs = outputs
 
 	newBlock.TransactionCounter = 1
 	ts := []model.CoreTransaction{t1}
