@@ -57,7 +57,7 @@ func Mine() {
 		return
 	}
 	//有则以现有区块为父区块挖下一个区块。
-	MineFromParent(parentBlock)
+	MineFromParent(*parentBlock)
 }
 
 /*
@@ -105,14 +105,15 @@ func MineForGenesis() {
 
 	newBlock.Blockheader = head
 
-	digging(newBlock.Blockheader)
+	digging(newBlock)
 
 }
 
 /*
 * 挖呀挖呀挖
-*/
-func digging(model.CoreBlockheader head){
+ */
+func digging(newBlock model.CoreBlock) {
+	head := newBlock.Blockheader
 	lastSeek := time.Now().UnixNano()
 	rand.Seed(lastSeek)
 	//挖吖挖吖挖
@@ -158,7 +159,7 @@ func MineFromParent(parentBlock model.CoreBlock) {
 	t1 := model.CoreTransaction{}
 	t1.Version = "1.0"
 	t1.InputCounter = 0
-	t1.OutputCount = 1
+	t1.OutputCounter = 1
 	outputs := make([]model.CoreOutput, 1, 1)
 	output := model.CoreOutput{}
 	output.Amt = Config.InitFund
@@ -178,13 +179,13 @@ func MineFromParent(parentBlock model.CoreBlock) {
 	head.Timestamp = time.Now()
 
 	//检查前两个区块玩出来的时间差，以决定要不要跳转目标难度
-	parentHead.ParentHeadHash
+	//parentHead.ParentHeadHash
 	head.Target = [4]byte{0x00, 0x00, 0x8F, 0xFF}
 
 	newBlock.Blockheader = head
-	
+
 	//挖呀挖呀挖
-	digging(newBlock.Blockheader)
+	digging(newBlock)
 }
 
 /*

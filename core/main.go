@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	_ "xiaoke1256.com/mycoin/db"
 	"xiaoke1256.com/mycoin/miner"
 )
 
