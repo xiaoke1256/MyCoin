@@ -50,14 +50,14 @@ func init() {
 
 func Mine() {
 	//看看数据库里有没有区块
-	var parentBlock *model.CoreBlock = db.SearchLastOne("block", "blockheader.timestamp", model.CoreBlock{})
+	var parentHead *model.CoreBlockheader = db.SearchLastOne("head", "timestamp", model.CoreBlockheader{})
 	//没有则挖创世区块
-	if parentBlock == nil {
+	if parentHead == nil {
 		MineForGenesis()
 		return
 	}
 	//有则以现有区块为父区块挖下一个区块。
-	MineFromParent(*parentBlock)
+	MineFromParent(*parentHead)
 }
 
 /*
@@ -141,14 +141,15 @@ func digging(newBlock model.CoreBlock) {
 	}
 	//挖出来了就保存区块
 	db.Connect()
-	db.Insert("block", newBlock)
+	//db.Insert("block", newBlock)
+	db.Insert("head", newBlock.Blockheader)
+	db.Insert("body", model.Body{crypt.DoubleSha256(newBlock.Blockheader.ToBytes()), newBlock.TransactionCounter, newBlock.Transactions})
 }
 
 /*
  * 从父块开始挖
  */
-func MineFromParent(parentBlock model.CoreBlock) {
-	parentHead := parentBlock.Blockheader
+func MineFromParent(parentHead model.CoreBlockheader) {
 
 	//构造block
 	newBlock := model.CoreBlock{}

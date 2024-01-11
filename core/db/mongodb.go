@@ -95,6 +95,39 @@ func Insert(collectionName string, obj any) {
 	//fmt.Println("Inserted documents with IDs:", result.InsertedIDs)
 }
 
+func SearchById[T any](collectionName string, id any, org T) *T {
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
+
+	// Connect to MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Collection handle
+	collection := client.Database(Config.Database).Collection(collectionName)
+
+	l := options.Find().SetLimit(1)
+	var result T
+	cur, err := collection.Find(ctx, bson.M{"_id": id}, l)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cur.Close(ctx)
+	if cur.Next(ctx) {
+		err := cur.Decode(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return &result
+}
+
 func Search[T any](collectionName string) []T {
 	// Set client options
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
