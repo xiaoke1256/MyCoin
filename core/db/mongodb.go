@@ -174,7 +174,7 @@ func Search[T any](collectionName string) []T {
 /*
 查询最后一个区块
 */
-func SearchLastOne[T any](collectionName string, orderCol string, org T) *T {
+func SearchLastOne[T any](collectionName string, orderCol string, org T) T {
 	// Set client options
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
 
@@ -206,5 +206,5 @@ func SearchLastOne[T any](collectionName string, orderCol string, org T) *T {
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return &result
+	return result
 }

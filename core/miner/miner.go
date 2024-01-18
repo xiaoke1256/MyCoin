@@ -50,14 +50,14 @@ func init() {
 
 func Mine() {
 	//看看数据库里有没有区块
-	var parentHead *model.CoreBlockheader = db.SearchLastOne("head", "timestamp", model.CoreBlockheader{})
+	var parentHead model.CoreBlockheader = db.SearchLastOne("head", "timestamp", model.CoreBlockheader{})
 	//没有则挖创世区块
-	if parentHead == nil {
+	if parentHead.Version == "" {
 		MineForGenesis()
 		return
 	}
 	//有则以现有区块为父区块挖下一个区块。
-	MineFromParent(*parentHead)
+	MineFromParent(parentHead)
 }
 
 /*
