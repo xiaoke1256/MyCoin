@@ -128,7 +128,7 @@ func SearchById[T any](collectionName string, id any, org T) *T {
 	return &result
 }
 
-func Search[T any](collectionName string) []T {
+func Search[T any](collectionName string, limit int64, org T) []T {
 	// Set client options
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", Config.Host, Config.Port))
 
@@ -144,6 +144,8 @@ func Search[T any](collectionName string) []T {
 	collection := client.Database(Config.Database).Collection(collectionName)
 
 	// // Find a single document
+	l := options.Find().SetLimit(limit)
+	//s := options.Find().SetSort(bson.D{{orderCol, -1}})
 	// var result T
 	// err = collection.FindOne(ctx, bson.M{"name": "Tom"}).Decode(&result)
 	// if err != nil {
@@ -152,7 +154,7 @@ func Search[T any](collectionName string) []T {
 
 	// Find multiple documents
 	var results []T
-	cur, err := collection.Find(ctx, bson.M{"age": bson.M{"$gt": 17}})
+	cur, err := collection.Find(ctx, bson.M{}, l)
 	if err != nil {
 		log.Fatal(err)
 	}
