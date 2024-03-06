@@ -130,10 +130,10 @@ func digging(newBlock model.CoreBlock) {
 		head.Nonce = bytes4
 		//校验是否满足target
 		hashedBytes := crypt.Md5(head.ToBytes())
-		fmt.Printf("hashedBytes: %x \n", hashedBytes)
+		log.Printf("hashedBytes: %x", hashedBytes)
 		var hashedBytes4 [4]byte
 		copy(hashedBytes4[:4], hashedBytes[0:4])
-		fmt.Printf("hashedBytes4: %x \n", hashedBytes4)
+		log.Printf("hashedBytes4: %x", hashedBytes4)
 		if compareBytes(hashedBytes4, head.Target) < 0 {
 			//满足需求
 			break
@@ -182,7 +182,7 @@ func MineFromParent(parentHead model.CoreBlockheader) {
 
 	//检查前两个区块玩出来的时间差，以决定要不要跳转目标难度
 	//parentHead.ParentHeadHash
-	head.Target = [4]byte{0x00, 0x00, 0x8F, 0xFF}
+	head.Target = [4]byte{0x00, 0x00, 0xFF, 0xFF}
 
 	newBlock.Blockheader = head
 
