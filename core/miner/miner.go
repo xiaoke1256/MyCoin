@@ -175,7 +175,7 @@ func MineFromParent(parentHead model.CoreBlockheader) {
 		t := otherTs[i]
 		t.LockTime = time.Now()
 	}
-	//针对每笔交易检查合法性，检查是否双花
+	//TODO 针对每笔交易检查合法性，检查是否双花
 
 	newBlock.TransactionCounter = 1
 	ts := []model.CoreTransaction{t1}
@@ -185,6 +185,8 @@ func MineFromParent(parentHead model.CoreBlockheader) {
 		//如果配置文件说不允许空区块则直接反回
 	}
 	newBlock.Transactions = ts
+
+	//TODO 检查区块的大小，如果过大删除部分交易重新打包
 
 	//构造新的Head
 	head := model.CoreBlockheader{}
