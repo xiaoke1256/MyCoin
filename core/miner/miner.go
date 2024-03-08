@@ -169,8 +169,21 @@ func MineFromParent(parentHead model.CoreBlockheader) {
 	outputs[0] = output
 	t1.Outputs = outputs
 
+	//从db中读取若干条及交易
+	otherTs := CollectTransaction(10) //默认读取10条
+	for i := 0; i < len(otherTs); i++ {
+		t := otherTs[i]
+		t.LockTime = time.Now()
+	}
+	//针对每笔交易检查合法性，检查是否双花
+
 	newBlock.TransactionCounter = 1
 	ts := []model.CoreTransaction{t1}
+	if len(otherTs) > 0 {
+		ts = append(ts, otherTs...)
+	} else {
+		//如果配置文件说不允许空区块则直接反回
+	}
 	newBlock.Transactions = ts
 
 	//构造新的Head
