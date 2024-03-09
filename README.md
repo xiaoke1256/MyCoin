@@ -66,6 +66,8 @@ Transactions | 不定 | 交易 | 记录在区块里的交易信息，使用原�
 不定|解锁脚本|满足UTXO解锁脚本条件的脚本
 4|序列号|固定值0xFFFFFFFF
 
+注：UTXO 是 Unspent Transaction Output 的缩写。
+
 4.1 普通交易输出信息
 
 字节长度 | 字段 | 说明
